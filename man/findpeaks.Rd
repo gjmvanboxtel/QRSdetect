@@ -29,13 +29,13 @@ after removing the mean.}
 \value{
 When called with \code{minw = 0} and \code{maxw = Inf}, this function returns a \code{\link{list}} containing
         two values:
-  \itemize{
+  \describe{
     \item{\code{$pks}: }{array containing the value of \code{data} at the peaks}
     \item{\code{$idx}: }{array containing the peak indices}
   }
   When called with either \code{minw > 0} or \code{maxw < Inf}, then the returned \code{\link{list}} contains these additional
   variables:
-  \itemize{
+  \describe{
     \item{\code{$parabol}: }{a \code{\link{list}} containing additional information about the parabol fitted to the peak.
     The \code{\link{list}} \code{$pp} contains the coefficients of the 2nd degree polynomial (\code{a}, \code{b}, and \code{b2}),
     and \code{$x} the extrema of the interval where it was fitted (\code{$from}, \code{to}).}
