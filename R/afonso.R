@@ -62,6 +62,7 @@
 #' }
 #' @export
 
+
 afonso <- function (ecg, fs) {
 
   # Calculate analysis filter order, bandwidth, and downsampling rate

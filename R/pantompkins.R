@@ -61,6 +61,7 @@
 #' }
 #' @export
 
+
 pantompkins <- function (ecg, fs) {
 
   l <- length(ecg)
