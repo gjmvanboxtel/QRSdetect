@@ -43,7 +43,7 @@
 #'
 #' @references Pan, J., & Tompkins, W.J. (1985). A real-time QRS detection algorithm. IEEE Transactions on
 #'             Biomedical Engineering, Vol. BME-32, Issue 3, 230-236,
-#'             DOI: \url{https://dx.doi.org/10.1109/TBME.1985.325532}{10.1109/TBME.1985.325532}
+#'             DOI: \href{https://dx.doi.org/10.1109/TBME.1985.325532}{10.1109/TBME.1985.325532}
 #'
 #' @author Geert van Boxtel
 #'
