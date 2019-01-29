@@ -16,6 +16,7 @@
 #
 # Version history
 # 20190116  GvB       Initial setup for package QRSdetect
+# 20190129  GvB       Added RMS function to compute Root Mean Square
 #
 #---------------------------------------------------------------------------------------------------------------------
 
@@ -46,3 +47,6 @@ is.posscal <- function (x) is.scalar(x) && x >= 0
 #' @rdname QRSdectect-internal
 is.wholenumber <- function(x, tol = .Machine$double.eps^0.5)  abs(x - round(x)) < tol
 
+# Root Mean Square
+#' @rdname QRSdectect-internal
+RMS <- function (x) sqrt(mean(x^2, na.rm = TRUE))

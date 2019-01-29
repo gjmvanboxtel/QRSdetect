@@ -17,6 +17,7 @@
 #
 # Version history
 # 20190116  GvB       Initial setup for package QRSdetect
+# 20190124  GvB       Minor bugfixes; suppress warning if ds=T and negative values found; return sorted peaks
 #
 #---------------------------------------------------------------------------------------------------------------------
 
@@ -123,9 +124,9 @@ findpeaks <- function (data, minh = .Machine$double.eps, mind = 1, minw = 1, max
     tmp <- data
     data <- .data
     .data <- tmp
-  } else {
-    if (min(data,na.rm=T) < 0) warning("findpeaks: ds is FALSE but data contain negative values")
-  }
+  } #else {
+    #if (min(data,na.rm=T) < 0) warning("findpeaks: ds is FALSE but data contain negative values")
+  #}
 
   # Rough estimates of first and second derivative
   df1 <- diff (data, differences=1)[c(1,1:(length(data)-1))]
@@ -147,9 +148,8 @@ findpeaks <- function (data, minh = .Machine$double.eps, mind = 1, minw = 1, max
   ## Treat peaks separated less than mind as one
   D <- with(expand.grid(A=idx.s,B=t(idx.s)), abs(A-B))
   dim(D) <- c(length(idx.s),length(idx.s))
-  if (any(D) < mind) {
-    i <- 1
-    peak <- NULL
+  diag(D) <- NA     # eliminate diagonal comparison
+  if (any(D, na.rm=T) < mind) {
     node2visit <- 1:length(idx.s)
     visited <- NULL
     idx.pruned <- idx.s
@@ -166,9 +166,9 @@ findpeaks <- function (data, minh = .Machine$double.eps, mind = 1, minw = 1, max
     }
     idx <- idx.pruned
   }
+  idx <- sort(idx)
 
-
-  # If minw or maxw are specified, then do the following
+  # If mind or minw or maxw are specified, then do the following
   # Estimate widths of peaks and filter for:
   # width smaller than given.
   # wrong concavity.
@@ -208,6 +208,7 @@ findpeaks <- function (data, minh = .Machine$double.eps, mind = 1, minw = 1, max
   else pks <- data[idx]
 
   # return values
+  if (length(idx) <= 0) return (NULL) # prevent error in assigning colnames
   if (minw > 0 || maxw < Inf) {
     colnames(extra.x) <- c('from','to')
     colnames(extra.pp) <- c('b2','b', 'a')
