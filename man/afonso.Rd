@@ -33,14 +33,14 @@ pages maintained by Alois Schloegl (http://pub.ist.ac.at/~schloegl/). A few
 improvements and minor bug fixes were made, as well as comments added.
 }
 \examples{
-data(ecg)
+data(rec100)
 fs <- 360
-pks <- afonso(ecg$MLII, fs)
+pks <- afonso(rec100$MLII, fs)
 
 \dontrun{
 # plot first 5 seconds of data
 N <- 5 * fs
-plot (ecg$time[1:N], ecg$MLII[1:N], type = "l", main = "MIT-BIH database, record 100",
+plot (rec100$time[1:N], rec100$MLII[1:N], type = "l", main = "MIT-BIH database, record 100",
       xlab = "Time (s)", ylab = "Amplitude (mV)")
 points (pks[which(pks<=N)]/fs, ecg$MLII[pks[which(pks<=N)]], col="red")
 }
