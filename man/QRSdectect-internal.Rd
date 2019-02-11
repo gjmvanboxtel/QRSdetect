@@ -4,6 +4,7 @@
 \alias{is.scalar}
 \alias{is.posscal}
 \alias{is.wholenumber}
+\alias{RMS}
 \title{QRSdectect-internal}
 \usage{
 is.scalar(x)
@@ -11,6 +12,8 @@ is.scalar(x)
 is.posscal(x)
 
 is.wholenumber(x, tol = .Machine$double.eps^0.5)
+
+RMS(x)
 }
 \description{
 Internal or barely commented functions not exported from the namespace.

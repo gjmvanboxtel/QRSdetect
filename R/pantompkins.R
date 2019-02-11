@@ -16,6 +16,7 @@
 #
 # Version history
 # 20190116  GvB       Initial setup for package QRSdetect
+# 20190211  GvB       check array bounds when computing local maxima in nonfiltered ECG
 #
 #---------------------------------------------------------------------------------------------------------------------
 
@@ -48,19 +49,18 @@
 #' @author Geert van Boxtel
 #'
 #' @examples
-#' data(ecg)
+#' data(rec100)
 #' fs <- 360
-#' pks <- pantompkins(ecg$MLII, fs)
+#' pks <- pantompkins(rec100$MLII, fs)
 #'
 #' \dontrun{
 #' # plot first 5 seconds of data
 #' N <- 5 * fs
-#' plot (ecg$time[1:N], ecg$MLII[1:N], type = "l", main = "MIT-BIH database, record 100",
+#' plot (rec100$time[1:N], rec100$MLII[1:N], type = "l", main = "MIT-BIH database, record 100",
 #'       xlab = "Time (s)", ylab = "Amplitude (mV)")
 #' points (pks[which(pks<=N)]/fs, ecg$MLII[pks[which(pks<=N)]], col="red")
 #' }
 #' @export
-
 
 pantompkins <- function (ecg, fs) {
 
@@ -102,7 +102,9 @@ pantompkins <- function (ecg, fs) {
   cand.idx <- sort(peaks$idx)
   idx <- NULL
   for (i in 1:length(cand.idx)) {
-    idx <- c(idx, which.max(ecg[(cand.idx[i]-half.int+1):(cand.idx[i]+half.int)]) + cand.idx[i]-half.int)
+    idx <- c(idx, which.max(
+        ecg[max(1, cand.idx[i] - half.int + 1) : min(l, cand.idx[i] + half.int)]
+      ) + cand.idx[i] - half.int)
   }
 
   return (idx)

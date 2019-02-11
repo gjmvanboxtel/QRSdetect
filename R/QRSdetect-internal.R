@@ -1,4 +1,4 @@
-# QRSdetect-internal.R - internal or barely commented functions not exported from the namespace
+# QRSdetect-internal.R - internal or barely commented functions
 # Copyright (C) 2019  Geert van Boxtel,
 #
 # This program is free software: you can redistribute it and/or modify
@@ -20,33 +20,34 @@
 #
 #---------------------------------------------------------------------------------------------------------------------
 
-#' QRSdectect-internal
+#' QRSdetect-internal
 #'
 #' Internal or barely commented functions not exported from the namespace.
+#' @name QRSdetect-internal
+NULL
 #'
 #' \preformatted{
-#' ## TYPE CHECKING AND CONVERSION
 #'   is.scalar(x)                                      # test if x is a scalar
 #'   is.posscal(x)                                     # test if x is a positive scalar
 #'   is.wholenumber(x, tol = .Machine$double.eps^0.5)  # test if x is a whole number
-#'   }
-#' @keywords internal
+#'   RMS(x)                                            # Root Mean Square
+#' }
+#' @param x object
+#' @param tol tolerance
 #' @author Geert van Boxtel
 
-# dummy
-
 # test if x is a scalar
-#' @rdname QRSdectect-internal
+#' @rdname QRSdetect-internal
 is.scalar <- function(x) is.atomic(x) && length(x) == 1L && !is.character(x) && Im(x)==0
 
 # test if x is a positive scalar
-#' @rdname QRSdectect-internal
+#' @rdname QRSdetect-internal
 is.posscal <- function (x) is.scalar(x) && x >= 0
 
 # test if x is a whole number
-#' @rdname QRSdectect-internal
+#' @rdname QRSdetect-internal
 is.wholenumber <- function(x, tol = .Machine$double.eps^0.5)  abs(x - round(x)) < tol
 
 # Root Mean Square
-#' @rdname QRSdectect-internal
+#' @rdname QRSdetect-internal
 RMS <- function (x) sqrt(mean(x^2, na.rm = TRUE))

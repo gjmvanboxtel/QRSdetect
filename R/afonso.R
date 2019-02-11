@@ -16,6 +16,7 @@
 #
 # Version history
 # 20190117  GvB       Initial setup for package QRSdetect
+# 20190210  GvB       Pad signal with one second of data to ramp up and down the filters
 #
 #---------------------------------------------------------------------------------------------------------------------
 
@@ -49,21 +50,23 @@
 #' @author Geert van Boxtel
 #'
 #' @examples
-#' data(ecg)
+#' data(rec100)
 #' fs <- 360
-#' pks <- afonso(ecg$MLII, fs)
+#' pks <- afonso(rec100$MLII, fs)
 #'
 #' \dontrun{
 #' # plot first 5 seconds of data
 #' N <- 5 * fs
-#' plot (ecg$time[1:N], ecg$MLII[1:N], type = "l", main = "MIT-BIH database, record 100",
+#' plot (rec100$time[1:N], rec100$MLII[1:N], type = "l", main = "MIT-BIH database, record 100",
 #'       xlab = "Time (s)", ylab = "Amplitude (mV)")
 #' points (pks[which(pks<=N)]/fs, ecg$MLII[pks[which(pks<=N)]], col="red")
 #' }
 #' @export
 
-
 afonso <- function (ecg, fs) {
+
+  # pad signal with one second to beginning and end of data to ramp up and down the filters
+  pecg <- c(rev(ecg[1:fs]), ecg, rev(ecg[(length(ecg) - fs + 1):length(ecg)]))
 
   # Calculate analysis filter order, bandwidth, and downsampling rate
   N <- round(fs)         #filter order
@@ -86,13 +89,13 @@ afonso <- function (ecg, fs) {
   h4 <- signal::fir1(N, Wn4, 'pass')
 
   # Downsample and filter with polyphase implementation
-  downdim <- ceiling(length(ecg) / M)
+  downdim <- ceiling(length(pecg) / M)
   y <- matrix(0, downdim, 5)
-  # y[,1] <- polyphase(ecg, h0, M) In nqrsdetect, but not used
-  y[,2] <- polyphase(ecg, h1, M)
-  y[,3] <- polyphase(ecg, h2, M)
-  y[,4] <- polyphase(ecg, h3, M)
-  y[,5] <- polyphase(ecg, h4, M)
+  # y[,1] <- polyphase(pecg, h0, M) In nqrsdetect, but not used
+  y[,2] <- polyphase(pecg, h1, M)
+  y[,3] <- polyphase(pecg, h2, M)
+  y[,4] <- polyphase(pecg, h3, M)
+  y[,5] <- polyphase(pecg, h4, M)
 
   # Cut off initial transient because of filtering
   cut <- ceiling(N/M)
@@ -350,17 +353,19 @@ afonso <- function (ecg, fs) {
   #-------------------------------------
   # Now, finally, convert the signal peaks at level 5
   # to the original ECG signal (not downsampled)
-  peaks <- conversion(ecg, FL2, signalL5, M, N, fs)
+  peaks <- conversion(pecg, FL2, signalL5, M, N, fs)
 
   # Added GvB: find local maxima in unfiltered ECG
-  # use an interval of 50 ms around the candidate peak, half at each side
-  half.int <- (round(0.05*fs/2))
-  cand.pks <- sort(peaks)
+  # use an interval of 100 ms around the candidate peak, half at each side
+  half.int <- (round(0.1*fs/2))
+  cand.idx <- sort(peaks)
   peaks <- NULL
-  for (i in 1:length(cand.pks)) {
-    peaks <- c(peaks, which.max(ecg[(cand.pks[i]-half.int+1):(cand.pks[i]+half.int)]) + cand.pks[i]-half.int)
+  for (i in 1:length(cand.idx)) {
+    peaks <- c(peaks, which.max(
+      pecg[max(1, cand.idx[i] - half.int + 1) : min(length(pecg), cand.idx[i] + half.int)]
+    ) + cand.idx[i] - half.int)
   }
-  return(peaks)
+  return(peaks[peaks > fs & peaks < length(pecg) - fs + 1] - fs)
 }
 
 #------------------------------------------------------------------------------

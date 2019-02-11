@@ -18,6 +18,7 @@
 # Version history
 # 20190116  GvB       Initial setup for package QRSdetect
 # 20190124  GvB       Minor bugfixes; suppress warning if ds=T and negative values found; return sorted peaks
+# 20190208  GvB       Minor bugfix in any(D)
 #
 #---------------------------------------------------------------------------------------------------------------------
 
@@ -135,21 +136,21 @@ findpeaks <- function (data, minh = .Machine$double.eps, mind = 1, minw = 1, max
   # check for changes of sign of 1st derivative and negativity of 2nd derivative.
   # <= in 1st derivative includes the case of oversampled signals.
   idx <- which(df1*c(df1[2:length(df1)],0) <= 0 & c(df2[2:length(df2)],0) < 0)
+  # idx <- which(diff(sign(df1)) < 0 & df2[2:length(df2)] < 0)
 
   # Get peaks that are beyond given height
   tf  <- which(data[idx] > minh)
   idx <- idx[tf]
   if (length(idx) <= 0) return (NULL)
 
-  # sort according to magnitude
+  # sort according to magnitude (if two peaks are close together, take the largest one)
   tmp <- sort(data[idx],decreasing=T, index=T)
   idx.s <- idx[tmp$ix]
 
   ## Treat peaks separated less than mind as one
-  D <- with(expand.grid(A=idx.s,B=t(idx.s)), abs(A-B))
-  dim(D) <- c(length(idx.s),length(idx.s))
+  D <- outer(idx.s, idx.s, FUN = function(x, y) abs(x - y))
   diag(D) <- NA     # eliminate diagonal comparison
-  if (any(D, na.rm=T) < mind) {
+  if (any(D < mind, na.rm=T)) {
     node2visit <- 1:length(idx.s)
     visited <- NULL
     idx.pruned <- idx.s
