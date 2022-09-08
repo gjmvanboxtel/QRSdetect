@@ -12,44 +12,49 @@ afonso(ecg, fs)
 \item{fs}{The frequency in Hz with which the ecg was sampled}
 }
 \value{
-Numeric array containing the indices (sample numbers) at which the fiducial R-peaks were found
+Numeric array containing the indices (sample numbers) at which the
+  fiducial R-peaks were found
 }
 \description{
-Detect R peaks of the QRS complex in a raw ECG record, based on the filter-bank
-algorithm proposed by Afonso et al. (1999)
+Detect R peaks of the QRS complex in a raw ECG record, based on the
+filter-bank algorithm proposed by Afonso et al. (1999)
 }
 \details{
 The Afonso et al. algorithm uses filter banks (polyphase implementation) and
 determines candidate R-peaks on downsampled signals in different frequency
-bands. Initially, a large number of false positives are generated. Then, logic
-is added to decrease the number of false positives while maintaining a low
-number of false negatives. This method is currently one of the most accurate
-available (> 99.5% accuracy in various databases), and also one of the fastest
-(because the logic is applied on downsampled signals).
+bands. Initially, a large number of false positives are generated. Then,
+logic is added to decrease the number of false positives while maintaining a
+low number of false negatives. This method is currently one of the most
+accurate available (> 99.5% accuracy in various databases), and also one of
+the fastest (because the logic is applied on downsampled signals).
 
 The present R implementation is based on the Matlab/Octave version named
-nqrsdetect.m, Copyright (C) 2006 by Rupert Ortner, retrieved from the internet
-pages maintained by Alois Schloegl (http://pub.ist.ac.at/~schloegl/). A few
-improvements and minor bug fixes were made, as well as comments added.
+nqrsdetect.m, Copyright (C) 2006 by Rupert Ortner, retrieved from the
+internet pages maintained by Alois Schloegl
+(http://pub.ist.ac.at/~schloegl/). A few improvements and minor bug fixes
+were made, as well as comments added.
 }
 \examples{
 data(rec100)
-fs <- 360
+fs <- 360 
 pks <- afonso(rec100$MLII, fs)
 
 \dontrun{
-# plot first 5 seconds of data
-N <- 5 * fs
-plot (rec100$time[1:N], rec100$MLII[1:N], type = "l", main = "MIT-BIH database, record 100",
+# plot first 10 seconds of data
+N <- 10 * fs
+plot (rec100$time[1:N], rec100$MLII[1:N], type = "l",
+      main = "MIT-BIH database, record 100",
       xlab = "Time (s)", ylab = "Amplitude (mV)")
-points (pks[which(pks<=N)]/fs, ecg$MLII[pks[which(pks<=N)]], col="red")
+points (pks[which(pks <= N)] / fs, rec100$MLII[pks[which(pks <= N)]],
+        col="red")
 }
 }
 \references{
-Afonso, V.X., Tompkins, W.J., Nguyen, T.Q., & Luo, S.
-(1999). ECG beat detection using filter banks. IEEE Transactions on Biomedical
-Engineering, 46(2), 192-202. DOI: \href{https://dx.doi.org/10.1109/10.740882}{10.1109/10.740882}
+Afonso, V.X., Tompkins, W.J., Nguyen, T.Q., & Luo, S. (1999). ECG
+  beat detection using filter banks. IEEE Transactions on Biomedical
+  Engineering, 46(2), 192-202. DOI:
+  \href{https://dx.doi.org/10.1109/10.740882}{10.1109/10.740882}
 }
 \author{
-Geert van Boxtel
+Geert van Boxtel, \email{G.J.M.vanBoxtel@gmail.com}
 }

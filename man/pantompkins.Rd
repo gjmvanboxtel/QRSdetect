@@ -12,23 +12,26 @@ pantompkins(ecg, fs)
 \item{fs}{The frequency in Hz with which the ecg was sampled}
 }
 \value{
-Numeric array containing the indices (sample numbers) at which the fiducial R-peaks were found
+Numeric array containing the indices (sample numbers) at which the
+  fiducial R-peaks were found
 }
 \description{
-Detect R peaks of the QRS complex in a raw ECG record, based on the
-algorithm proposed by Pan & Tompkins (1985)
+Detect R peaks of the QRS complex in a raw ECG record, based on the algorithm
+proposed by Pan & Tompkins (1985)
 }
 \details{
-This function attempts to detect ECG fiducial points in a single-channel electrocardiogram signal using the
-algorithm proposed by Pan & Tompkins (1985). The algorithm was originally developed to be implemented in hardware.
+This function attempts to detect ECG fiducial points in a single-channel
+electrocardiogram signal using the algorithm proposed by Pan & Tompkins
+(1985). The algorithm was originally developed to be implemented in hardware.
 Here a software implementation with digital filters, and some improvements:
 \enumerate{
-  \item Filter the signal 5-15 Hz (Butterworth); pre- and postpad the signal with 1 s of reversed data
-        to ramp up and down the filter
+  \item Filter the signal 5-15 Hz (Butterworth); pre- and postpad the signal
+  with 1 s of reversed data to ramp up and down the filter
   \item Compute the derivative
   \item Square the derivative
   \item Apply a moving average (0.15 s filter length)
-  \item Search for the peak using findpeaks (mind = 200, minh = 2*sd of moving average), lookup local maximum in signal
+  \item Search for the peak using findpeaks (mind = 200, minh = 2*sd of
+  moving average), lookup local maximum in signal
 }
 }
 \examples{
@@ -37,18 +40,21 @@ fs <- 360
 pks <- pantompkins(rec100$MLII, fs)
 
 \dontrun{
-# plot first 5 seconds of data
-N <- 5 * fs
-plot (rec100$time[1:N], rec100$MLII[1:N], type = "l", main = "MIT-BIH database, record 100",
+# plot first 10 seconds of data
+N <- 10 * fs
+plot (rec100$time[1:N], rec100$MLII[1:N], type = "l",
+      main = "MIT-BIH database, record 100",
       xlab = "Time (s)", ylab = "Amplitude (mV)")
-points (pks[which(pks<=N)]/fs, ecg$MLII[pks[which(pks<=N)]], col="red")
+points (pks[which(pks <= N)] / fs, rec100$MLII[pks[which(pks <= N)]],
+        col = "red")
 }
 }
 \references{
-Pan, J., & Tompkins, W.J. (1985). A real-time QRS detection algorithm. IEEE Transactions on
-            Biomedical Engineering, Vol. BME-32, Issue 3, 230-236,
-            DOI: \href{https://dx.doi.org/10.1109/TBME.1985.325532}{10.1109/TBME.1985.325532}
+Pan, J., & Tompkins, W.J. (1985). A real-time QRS detection
+  algorithm. IEEE Transactions on Biomedical Engineering, Vol. BME-32, Issue
+  3, 230-236, DOI:
+  \href{https://dx.doi.org/10.1109/TBME.1985.325532}{10.1109/TBME.1985.325532}
 }
 \author{
-Geert van Boxtel
+Geert van Boxtel, \email{G.J.M.vBoxtel@gmail.com}
 }

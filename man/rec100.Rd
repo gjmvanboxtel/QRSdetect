@@ -4,13 +4,15 @@
 \name{rec100}
 \alias{rec100}
 \title{Electrocardiogram data}
-\format{A dataset with 3 variables and 108000 observations (the first 5 minutes out of the
+\format{
+A dataset with 3 variables and 108000 observations (the first 5 minutes out of the
         recording of about 30 minutes):
 \describe{
   \item{time}{the time base in seconds (0 - 299.997)}
   \item{MLII}{ECG from a Modified Leg lead, in millivolts}
   \item{V5}{ECG from a V5 lead, in millivolts}
-}}
+}
+}
 \source{
 \url{https://physionet.org/physiobank/database/mitdb/}, (\href{https://dx.doi.org/10.13026/C2F305}{doi:10.13026/C2F305}).
 }

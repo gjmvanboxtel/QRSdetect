@@ -1,8 +1,8 @@
 Package: QRSdetect
 Type: Package
 Title: Detect QRS Complexes From The Electrocardiogran
-Version: 0.1.0.9005
-Date: 2019-02-11
+Version: 0.1.0.9006
+Date: 2022-09-07
 Authors@R: person("Geert", "van Boxtel", email = "G.J.M.vanBoxtel@gmail.com", role = c("aut", "cre"))
 Description: A set of functions for detecting QRS complexes from the ECG. It includes functions to
     work with Physionet files, and functions to test the accuracy of the implemented algorithms. A Shiny app 
@@ -10,8 +10,8 @@ Description: A set of functions for detecting QRS complexes from the ECG. It inc
 License: GPL-3
 Encoding: UTF-8
 LazyData: true
-Imports: signal (>= 0.7-6)
-Depends: R (>= 3.2.0)
+Imports: gsignal
+Depends: R (>= 4.2.0)
 URL: http://github.com/gjmvanboxtel/QRSdetect
 BugReports: http://github.com/gjmvanboxtel/QRSdetect/issues
-RoxygenNote: 6.1.1
+RoxygenNote: 7.2.1

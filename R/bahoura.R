@@ -16,6 +16,7 @@
 #
 # Version history
 # 20190211  GvB       Initial setup for package QRSdetect
+# 20220907  GvB       Use package gsignal instead of signal
 #
 #---------------------------------------------------------------------------------------------------------------------
 
@@ -66,23 +67,23 @@ bahoura <- function (ecg, fs) {
   g <- c(2, -2)
 
   # use signal resampled to 250 Hz, which was also used by Bahoura et al.
-  R <- signal::resample(pecg, 250, fs)
+  R <- gsignal::resample(pecg, 25000, round(fs * 100))
 
   # compute wavelet and scaling coefficients for first 4 levels
-  S1 <- signal::conv(R, h)
-  W1 <- signal::conv(R, g)
-  R <- signal::resample(R, 125, 250)
+  S1 <- gsignal::conv(R, h)
+  W1 <- gsignal::conv(R, g)
+  R <- gsignal::resample(R, 12500, 25000)
 
-  S2 <- signal::conv(R, h)
-  W2 <- signal::conv(R, g)
-  R <- signal::resample(R, 62.5, 125)
+  S2 <- gsignal::conv(R, h)
+  W2 <- gsignal::conv(R, g)
+  R <- gsignal::resample(R, 6250, 12500)
 
-  S3 <- signal::conv(R, h)
-  W3 <- signal::conv(R, g)
-  R <- signal::resample(R, 31.25, 62.5)
+  S3 <- gsignal::conv(R, h)
+  W3 <- gsignal::conv(R, g)
+  R <- gsignal::resample(R, 3125, 6250)
 
-  S4 <- signal::conv(R, h)
-  W4 <- signal::conv(R, g)
+  S4 <- gsignal::conv(R, h)
+  W4 <- gsignal::conv(R, g)
 
   # Compute modulus maxima lines
   getMML <- function (W, j) {

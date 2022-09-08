@@ -1,5 +1,5 @@
 # afonso.R - QRS detection algorithm proposed by Afonso et al. (1999)
-# Copyright (C) 2019  Geert van Boxtel
+# Copyright (C) 2022  Geert van Boxtel
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -17,49 +17,55 @@
 # Version history
 # 20190117  GvB       Initial setup for package QRSdetect
 # 20190210  GvB       Pad signal with one second of data to ramp up and down the filters
+# 20220922  GvB       use gsignal instead of signal library
 #
 #---------------------------------------------------------------------------------------------------------------------
 
 #' Afonso et al. QRS detection
 #'
-#' Detect R peaks of the QRS complex in a raw ECG record, based on the filter-bank
-#' algorithm proposed by Afonso et al. (1999)
+#' Detect R peaks of the QRS complex in a raw ECG record, based on the
+#' filter-bank algorithm proposed by Afonso et al. (1999)
 #'
 #' The Afonso et al. algorithm uses filter banks (polyphase implementation) and
 #' determines candidate R-peaks on downsampled signals in different frequency
-#' bands. Initially, a large number of false positives are generated. Then, logic
-#' is added to decrease the number of false positives while maintaining a low
-#' number of false negatives. This method is currently one of the most accurate
-#' available (> 99.5% accuracy in various databases), and also one of the fastest
-#' (because the logic is applied on downsampled signals).
+#' bands. Initially, a large number of false positives are generated. Then,
+#' logic is added to decrease the number of false positives while maintaining a
+#' low number of false negatives. This method is currently one of the most
+#' accurate available (> 99.5% accuracy in various databases), and also one of
+#' the fastest (because the logic is applied on downsampled signals).
 #'
 #' The present R implementation is based on the Matlab/Octave version named
-#' nqrsdetect.m, Copyright (C) 2006 by Rupert Ortner, retrieved from the internet
-#' pages maintained by Alois Schloegl (http://pub.ist.ac.at/~schloegl/). A few
-#' improvements and minor bug fixes were made, as well as comments added.
+#' nqrsdetect.m, Copyright (C) 2006 by Rupert Ortner, retrieved from the
+#' internet pages maintained by Alois Schloegl
+#' (http://pub.ist.ac.at/~schloegl/). A few improvements and minor bug fixes
+#' were made, as well as comments added.
 #'
 #' @param ecg The input single-channel input vector (raw ECG)
 #' @param fs The frequency in Hz with which the ecg was sampled
 #'
-#' @return Numeric array containing the indices (sample numbers) at which the fiducial R-peaks were found
+#' @return Numeric array containing the indices (sample numbers) at which the
+#'   fiducial R-peaks were found
 #'
-#' @references Afonso, V.X., Tompkins, W.J., Nguyen, T.Q., & Luo, S.
-#' (1999). ECG beat detection using filter banks. IEEE Transactions on Biomedical
-#' Engineering, 46(2), 192-202. DOI: \href{https://dx.doi.org/10.1109/10.740882}{10.1109/10.740882}
+#' @references Afonso, V.X., Tompkins, W.J., Nguyen, T.Q., & Luo, S. (1999). ECG
+#'   beat detection using filter banks. IEEE Transactions on Biomedical
+#'   Engineering, 46(2), 192-202. DOI:
+#'   \href{https://dx.doi.org/10.1109/10.740882}{10.1109/10.740882}
 #"
-#' @author Geert van Boxtel
+#' @author Geert van Boxtel, \email{G.J.M.vanBoxtel@@gmail.com}
 #'
 #' @examples
 #' data(rec100)
-#' fs <- 360
+#' fs <- 360 
 #' pks <- afonso(rec100$MLII, fs)
 #'
 #' \dontrun{
-#' # plot first 5 seconds of data
-#' N <- 5 * fs
-#' plot (rec100$time[1:N], rec100$MLII[1:N], type = "l", main = "MIT-BIH database, record 100",
+#' # plot first 10 seconds of data
+#' N <- 10 * fs
+#' plot (rec100$time[1:N], rec100$MLII[1:N], type = "l",
+#'       main = "MIT-BIH database, record 100",
 #'       xlab = "Time (s)", ylab = "Amplitude (mV)")
-#' points (pks[which(pks<=N)]/fs, ecg$MLII[pks[which(pks<=N)]], col="red")
+#' points (pks[which(pks <= N)] / fs, rec100$MLII[pks[which(pks <= N)]],
+#'         col="red")
 #' }
 #' @export
 
@@ -82,11 +88,11 @@ afonso <- function (ecg, fs) {
   Wn4 <- c(4*Bwn, 5*Bwn)
 
   #impulse response of the analysis filters
-  #h0 <- signal::fir1(N, Wn0) #In nqrsdetect, but not used
-  h1 <- signal::fir1(N, Wn1, 'pass')
-  h2 <- signal::fir1(N, Wn2, 'pass')
-  h3 <- signal::fir1(N, Wn3, 'pass')
-  h4 <- signal::fir1(N, Wn4, 'pass')
+  #h0 <- gsignal::fir1(N, Wn0) #In nqrsdetect, but not used
+  h1 <- gsignal::fir1(N, Wn1, 'pass')
+  h2 <- gsignal::fir1(N, Wn2, 'pass')
+  h3 <- gsignal::fir1(N, Wn3, 'pass')
+  h4 <- gsignal::fir1(N, Wn4, 'pass')
 
   # Downsample and filter with polyphase implementation
   downdim <- ceiling(length(pecg) / M)
@@ -270,7 +276,7 @@ afonso <- function (ecg, fs) {
   m1 <- 50     #100 in nqrsdetect.m
   a <- 1
   b <- rep(1/(m1), m1)
-  meanperiod <- as.vector(signal::filter(b, a, periods))
+  meanperiod <- as.vector(gsignal::filter(b, a, periods))
   # use mean of (51:end) as value for first 50
   # (not present in nqrsdetect.m)
   lmp <- length(meanperiod)
@@ -326,7 +332,7 @@ afonso <- function (ecg, fs) {
   # only after the loop.
   periods <- diff(signalL5)
   lp <- length(periods)
-  meanperiod <- as.vector(signal::filter(b, a, periods))
+  meanperiod <- as.vector(gsignal::filter(b, a, periods))
   lmp <- length(meanperiod)
   if (lmp > m1) meanperiod[1:m1] <- rep(mean(periods[1:m1]), m1)
   level <- mean(FL2[signalL5])
@@ -369,28 +375,6 @@ afonso <- function (ecg, fs) {
 }
 
 #------------------------------------------------------------------------------
-# downsample - downsample a signal without interpolation
-#              similar to MatlaB/Octave function
-#
-# parameters:
-# S:          signal to downsample
-# rate:       downsample factor
-# phase:      starting sample number
-#
-# returns:    downsampled signal
-#
-# Note: it is usually better do use the functions 'resample' or 'decimate'
-# from library(signal), as these functions will handle correct anti-aliasing
-# downsampling and interpolation.
-#
-# 20120411 Geert van Boxtel
-#------------------------------------------------------------------------------
-downsample <- function (S, rate, phase=1) {
-  down <- seq(phase, length(S), rate);
-  return(S[down]);
-}
-
-#------------------------------------------------------------------------------
 # polyphase - polyphase implementation of decimation filters
 #
 # y=polyphase(S,h,M)
@@ -404,7 +388,7 @@ downsample <- function (S, rate, phase=1) {
 #   filtered signal
 #
 # DEPENDS
-#   library(signal), function downsample
+#   gsignal::downsample
 #
 # ported to R from Matlab code in nqrsdetect by Geert van Boxtel 4-apr-2012;
 # also included some comments
@@ -414,8 +398,8 @@ downsample <- function (S, rate, phase=1) {
 # h <- c(1,2,3,4,5,6,7,8,9,10,0,0,3,2,5,4,3,2,1,0)
 # M<-10
 # non_polyphase<- function (S,h,M) {
-#   Sf <- signal::filter(h,1,S)
-#   y <- signal::resample(Sf, M)
+#   Sf <- gsignal::filter(h,1,S)
+#   y <- gsignal::resample(Sf, M)
 #   return (y)
 # }
 # system.time(y_nonp <- non_polyphase(S,h,M))
@@ -454,8 +438,8 @@ polyphase <- function (S, h, M) {
   Sdelay <- S
   w <- matrix (0, M, mx)
   for (i in 1:M) {
-    Sd <- downsample(Sdelay, M)
-    a <- signal::filter(e[i,], 1, Sd)
+    Sd <- gsignal::downsample(Sdelay, M)
+    a <- gsignal::filter(e[i,], 1, Sd)
     if (length(a) < mx) a <- c(a, rep(0, (mx-length(a))))
     w[i, 1:mx] <- a
     Sdelay <- c(rep(0,i), S)
@@ -592,7 +576,7 @@ conversion <- function (S, FL2, pold, M, N, fs) {
   signaln <- pold
   p <- M
   q <- 1
-  FL2res <- signal::resample(FL2,p,q)    #Upsampling of FL2
+  FL2res <- gsignal::resample(FL2,p,q)    #Upsampling of FL2
   nans <- which(is.nan(S))
   S[nans] <- mean(S)             #Replaces NaNs in Signal (necessary for filtering)
 
@@ -623,8 +607,8 @@ conversion <- function (S, FL2, pold, M, N, fs) {
   Bwn <- 1 / (fs/2) * Bw
   Wn <- c(Bwn, 5*Bwn)
   N1 <- 32
-  b <- signal::fir1(N1, Wn,'pass')
-  Sf <- signal::filtfilt(b, S)     #Filtered Signal with bandwidth 5.6-28 Hz
+  b <- gsignal::fir1(N1, Wn,'pass')
+  Sf <- gsignal::filtfilt(b, S)     #Filtered Signal with bandwidth 5.6-28 Hz
   beg <- round(1.5*M)
   fin <- 1*M
   signaln4 <- array(0, length(signaln))

@@ -2,5 +2,4 @@
 
 export(afonso)
 export(bahoura)
-export(findpeaks)
 export(pantompkins)

@@ -1,9 +1,11 @@
 # QRSdetect.R
 
+#' QRSdetect
+#' 
+#' Detect R peaks of the QRS complex in a raw ECG record, based on the
+#' various algorithms
+#' 
 #' @docType package
 #' @name QRSdetect
-#' @title QRSdetect
-#' @details
-#' Here is the general help for the QRSdetect package (to be filled in)
 
 NULL
